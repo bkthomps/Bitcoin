@@ -55,6 +55,7 @@ pk3=pow(g, sk3, p)
 # All variables should be decimal integers
 l1 = 2048-pk1.bit_length()
 l2 = 2048-pk2.bit_length()
+l3 = 2048-pk3.bit_length()
 # (b)(1)
 def buildm1():
 	amt1 = BitArray(hex='04')
@@ -66,20 +67,31 @@ def buildm1():
 m1 = buildm1()
 k1 = int(sha3_224_hex('01'), 16)
 r1 = pow(g, k1, p) % q
-
-z = sha3_224_hex(m1)[0:(int)(min(q.bit_length(), 224)/4)]
-	
-s1 = (int(z, 16) + sk1*r1) * pow(k1, -1, 11)
+z1 = sha3_224_hex(m1)[0:(int)(min(q.bit_length(), 224)/4)]
+s1 = (int(z1, 16) + sk1*r1) * pow(k1, -1, q)
  
 # (b)(2)
-# u=
-# v=
-# w=
-#  
-# # (b)(3)
-# k2=
-# r2=
-# s2=
+w = pow(s1, -1, q)
+u1 = int(z1, 16)*w % q
+u2 = r1*w % q 
+#NIST standard calculates v = ((g**u1)*(pk1**u2) % p) % q
+#below expression for v is mathematically equivalent 
+v = (pow(g, u1, p)*pow(pk1, u2, p) % p) % q
+print(v == r1)
+
+# (b)(3)
+def buildm2():
+	amt2 = BitArray(hex='03')
+	leadingZeroespk2 = ''.zfill(l2)
+	leadingZeroespk3 = ''.zfill(l3)
+	m2 = BitArray(bin=leadingZeroespk2) + BitArray(bin="{0:b}".format(pk2)) + BitArray(bin=leadingZeroespk3) + BitArray(bin="{0:b}".format(pk3)) + amt2
+	print(len(m2))
+	return m2.hex
+m2 = buildm2()
+k2 = int(sha3_224_hex('02'), 16)
+r2 = pow(g, k2, p) % q
+z2 = sha3_224_hex(m2)[0:(int)(min(q.bit_length(), 224)/4)]
+s2 = (int(z2, 16) + sk2*r2) * pow(k2, -1, q)
 
 
 # (c) PreImageOfPW1=h(amt0)||m1||nonce1, PreImageOfPW1=h(m1)||m2||nonce2, those two variables should be hex strings with on prefix of 0x
