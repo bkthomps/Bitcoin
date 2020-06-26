@@ -1,2 +1,4 @@
 .idea/*
 Constants.py
+venv/*
+__pycache__/*
