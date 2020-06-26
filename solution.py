@@ -70,15 +70,22 @@ k1 = int(sha3_224_hex('01'), 16)
 r1 = pow(g, k1, p) % q
 z1 = sha3_224_hex(m1)[0:(int)(min(q.bit_length(), 224)/4)]
 s1 = (int(z1, 16) + sk1*r1) * pow(k1, -1, q)
- 
+
 # (b)(2)
 w = pow(s1, -1, q)
 u1 = int(z1, 16)*w % q
 u2 = r1*w % q 
-#NIST standard calculates v = ((g**u1)*(pk1**u2) % p) % q
-#below expression for v is mathematically equivalent 
-v = (pow(g, u1, p)*pow(pk1, u2, p) % p) % q
-print(v == r1)
+v = (pow(g, u1, p)*pow(pk1, u2, p) % p) % q 
+
+def signUser1():
+	return Sign(p, q, g, k1, sk1, m1)
+ 
+def verifyUser1(signed):
+	return Verify(p, q, g, pk1, m1, signed[0], signed[1])
+	
+def signAndVerify():
+	signed = signUser1()
+	print(verifyUser1(signed))
 
 # (b)(3)
 def buildm2():
@@ -96,6 +103,21 @@ s2 = (int(z2, 16) + sk2*r2) * pow(k2, -1, q)
 
 
 # (c) PreImageOfPW1=h(amt0)||m1||nonce1, PreImageOfPW1=h(m1)||m2||nonce2, those two variables should be hex strings with on prefix of 0x
+def findNonce():
+	leadingZeroes = ''.zfill(32)
+	amt0 = BitArray(hex='05')
+	h_amt0 = sha3_224_hex(amt0.hex)
+	i = 0
+	while (True):
+		nonce = BitArray(int = i, length = 128)
+		input = BitArray(hex=h_amt0) + BitArray(hex=m1) + nonce
+		pw1 = sha3_224_hex(input.hex)
+		i += 1
+		if (pw1[0:32] == leadingZeroes):
+			return nonce
+	    
+nonce = findNonce()
+    
 PreImageOfPW1=""
 PreImageOfPW2=""
 
@@ -104,16 +126,21 @@ PreImageOfPW2=""
 #Part 3: DSA signature and verification
 # DSA signature function, p, q, g, k, sk are integers, Message are hex strings of even length.
 def Sign( p, q, g, k, sk, Message ):
-
-
+	r = pow(g, k, p) % q
+	z = sha3_224_hex(Message)[0:(int)(min(q.bit_length(), 224)/4)]
+	s = (int(z, 16) + sk*r) * pow(k, -1, q)
 	return r,s
 
 # DSA verification function,  p, q, g, k, pk are integers, Message are hex strings of even length.
 def Verify( p, q, g, pk, Message, r, s ):
-
-
-
-	if ():
+	w = pow(s, -1, q)
+	z = sha3_224_hex(Message)[0:(int)(min(q.bit_length(), 224)/4)]
+	u1 = int(z, 16)*w % q
+	u2 = r*w % q 
+	v = (pow(g, u1, p)*pow(pk, u2, p) % p) % q
+	if (v == r):
 		return True
 	else:   
 		return False
+	
+signAndVerify()
