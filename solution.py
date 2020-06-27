@@ -124,27 +124,15 @@ s2 = (int(z2, 16) + sk2 * r2) * pow(k2, -1, q)
 def findNonce():
     amt0 = BitArray(hex='05')
     h_amt0 = sha3_224_hex(amt0.hex)
-    print("For first nonce:")
-    print("len(h_amt0) " + str(4 * len(h_amt0)))
-    print("h_amt0 " + bin(int(h_amt0, 16)))
-    print("len(m1) " + str(4 * len(m1)))
-    print("m1 " + bin(int(m1, 16)))
-    print("\nFor second nonce:")
-    h_m1 = sha3_224_hex(m1)
-    print("len(h_m1) " + str(4 * len(h_m1)))
-    print("h_m1 " + bin(int(h_m1, 16)))
-    print("len(m2) " + str(4 * len(m2)))
-    print("m2 " + bin(int(m2, 16)))
-    # Do the rest in C, this is what it looks like in Python:
-    # leading_zeroes = ''.zfill(32)
-    # i = 0
-    # while True:
-    #    nonce = BitArray(int=i, length=128)
-    #    input = BitArray(hex=h_amt0) + BitArray(hex=m1) + nonce
-    #    pw1 = sha3_224_hex(input.hex)
-    #    i += 1
-    #    if pw1[0:32] == leading_zeroes:
-    #        return nonce
+    leading_zeroes = ''.zfill(32)
+    i = 0
+    while True:
+        nonce = BitArray(int=i, length=128)
+        input = BitArray(hex=h_amt0) + BitArray(hex=m1) + nonce
+        pw1 = sha3_224_hex(input.hex)
+        i += 1
+        if pw1[0:32] == leading_zeroes:
+            return nonce
 
 
 findNonce()
