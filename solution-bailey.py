@@ -117,6 +117,22 @@ print("sig_sk2(m2) = (" + str(hex(r2)) + ", " + str(hex(s2)) + ")")
 
 # (c) PreImageOfPW1=h(amt0)||m1||nonce1, PreImageOfPW2=h(m1)||m2||nonce2,
 # those two variables should be hex strings with no prefix of 0x
+amt0 = BitArray(hex='05')
+h_amt0 = sha3_224_hex(amt0.hex)
+print("\nFor first nonce:")
+print("len(h_amt0) " + str(4 * len(h_amt0)))
+print("h_amt0 " + bin(int(h_amt0, 16)))
+print("len(m1) " + str(4 * len(m1)))
+print("m1 " + bin(int(m1, 16)))
+print("\nFor second nonce:")
+h_m1 = sha3_224_hex(m1)
+print("len(h_m1) " + str(4 * len(h_m1)))
+print("h_m1 " + bin(int(h_m1, 16)))
+print("len(m2) " + str(4 * len(m2)))
+print("m2 " + bin(int(m2, 16)))
+print()
+# Now go to the C program, and input these values, and zero-pad them
+
 PreImageOfPW1 = ""
 PreImageOfPW2 = ""
 
