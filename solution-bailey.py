@@ -9,6 +9,7 @@ You are allowed to define whatever subroutines you like to structure your code.
 
 import hashlib
 import binascii
+from bitstring import BitArray
 
 """
 sha3_224_hex() is design to take a hexadecimal string as the input and compute it's sha3_224 hash value. 
@@ -53,25 +54,62 @@ pk1 = pow(g, sk1, p)
 pk2 = pow(g, sk2, p)
 pk3 = pow(g, sk3, p)
 
+lz1 = 2048 - pk1.bit_length()
+lz2 = 2048 - pk2.bit_length()
+lz3 = 2048 - pk3.bit_length()
+
+
 # (b) Sig_sk1 and Sig_sk2, k_i is the random number used in signature.
 # u, v, w is the intermediate results when verifying Sig_sk1(m1)
 # All variables should be decimal integers
 
 # (b)(1)
-k1 =
-r1 =
-s1 =
+def create_m1():
+    amt1 = BitArray(hex='04')
+    build_m1 = BitArray(bin=''.zfill(lz1)) + BitArray(bin="{0:b}".format(pk1))
+    build_m1 += BitArray(bin=''.zfill(lz2)) + BitArray(bin="{0:b}".format(pk2)) + amt1
+    return build_m1.hex
+
+
+k1 = int(sha3_224_hex('01'), 16)
+r1 = pow(g, k1, p) % q
+m1 = create_m1()
+z1 = sha3_224_hex(m1)
+s1 = (int(z1, 16) + sk1 * r1) * pow(k1, -1, q)
 
 # (b)(2)
-w =
-u1 =
-u2 =
-v =
+w = pow(s1, -1, q)
+u1 = int(z1, 16) * w % q
+u2 = r1 * w % q
+v = (pow(g, u1, p) * pow(pk1, u2, p) % p) % q
+
+
+def sign_user1():
+    return Sign(p, q, g, k1, sk1, m1)
+
+
+def verify_user1(signed):
+    return Verify(p, q, g, pk1, m1, signed[0], signed[1])
+
+
+def sign_and_verify():
+    signed = sign_user1()
+    return verify_user1(signed)
+
 
 # (b)(3)
-k2 =
-r2 =
-s2 =
+def create_m2():
+    amt2 = BitArray(hex='03')
+    build_m2 = BitArray(bin=''.zfill(lz2)) + BitArray(bin="{0:b}".format(pk2))
+    build_m2 += BitArray(bin=''.zfill(lz3)) + BitArray(bin="{0:b}".format(pk3)) + amt2
+    return build_m2.hex
+
+
+k2 = int(sha3_224_hex('02'), 16)
+r2 = pow(g, k2, p) % q
+m2 = create_m2()
+z2 = sha3_224_hex(m2)
+s2 = (int(z2, 16) + sk2 * r2) * pow(k2, -1, q)
 
 # (c) PreImageOfPW1=h(amt0)||m1||nonce1, PreImageOfPW2=h(m1)||m2||nonce2,
 # those two variables should be hex strings with no prefix of 0x
@@ -84,12 +122,20 @@ PreImageOfPW2 = ""
 # Part 3: DSA signature and verification
 # DSA signature function, p, q, g, k, sk are integers, Message are hex strings of even length.
 def Sign(p, q, g, k, sk, Message):
+    r = pow(g, k, p) % q
+    z = sha3_224_hex(Message)
+    s = (int(z, 16) + sk * r) * pow(k, -1, q)
     return r, s
 
 
 # DSA verification function,  p, q, g, k, pk are integers, Message are hex strings of even length.
 def Verify(p, q, g, pk, Message, r, s):
-    if:
-        return True
-    else:
-        return False
+    w = pow(s, -1, q)
+    z = sha3_224_hex(Message)
+    u1 = int(z, 16) * w % q
+    u2 = r * w % q
+    v = (pow(g, u1, p) * pow(pk, u2, p) % p) % q
+    return r == v
+
+
+print(sign_and_verify())
