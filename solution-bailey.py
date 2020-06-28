@@ -76,12 +76,15 @@ r1 = pow(g, k1, p) % q
 m1 = create_m1()
 z1 = sha3_224_hex(m1)
 s1 = (int(z1, 16) + sk1 * r1) * pow(k1, -1, q)
+print("sig_sk1(m1) = (" + str(hex(r1)) + ", " + str(hex(s1)) + ")")
 
 # (b)(2)
 w = pow(s1, -1, q)
 u1 = int(z1, 16) * w % q
 u2 = r1 * w % q
 v = (pow(g, u1, p) * pow(pk1, u2, p) % p) % q
+print("r1 = " + str(hex(r1)))
+print("v = " + str(hex(v)))
 
 
 def sign_user1():
@@ -110,6 +113,7 @@ r2 = pow(g, k2, p) % q
 m2 = create_m2()
 z2 = sha3_224_hex(m2)
 s2 = (int(z2, 16) + sk2 * r2) * pow(k2, -1, q)
+print("sig_sk2(m2) = (" + str(hex(r2)) + ", " + str(hex(s2)) + ")")
 
 # (c) PreImageOfPW1=h(amt0)||m1||nonce1, PreImageOfPW2=h(m1)||m2||nonce2,
 # those two variables should be hex strings with no prefix of 0x
@@ -128,7 +132,7 @@ def Sign(p, q, g, k, sk, Message):
     return r, s
 
 
-# DSA verification function,  p, q, g, k, pk are integers, Message are hex strings of even length.
+# DSA verification function, p, q, g, k, pk are integers, Message are hex strings of even length.
 def Verify(p, q, g, pk, Message, r, s):
     w = pow(s, -1, q)
     z = sha3_224_hex(Message)
