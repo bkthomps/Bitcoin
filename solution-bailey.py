@@ -120,18 +120,18 @@ print("sig_sk2(m2) = (" + str(hex(r2)) + ", " + str(hex(s2)) + ")")
 amt0 = BitArray(hex='05')
 h_amt0 = sha3_224_hex(amt0.hex)
 print("\nFor first nonce:")
-print("len(h_amt0) " + str(4 * len(h_amt0)))
-print("h_amt0 " + bin(int(h_amt0, 16)))
-print("len(m1) " + str(4 * len(m1)))
-print("m1 " + bin(int(m1, 16)))
+print("len(h_amt0): " + str(4 * len(h_amt0)))
+print("h_amt0: " + ''.zfill(224 - int(h_amt0, 16).bit_length()) + bin(int(h_amt0, 16))[2:])
+print("len(m1): " + str(4 * len(m1)))
+print("m1: " + ''.zfill(4104 - int(m1, 16).bit_length()) + bin(int(m1, 16))[2:])
 print("\nFor second nonce:")
 h_m1 = sha3_224_hex(m1)
-print("len(h_m1) " + str(4 * len(h_m1)))
-print("h_m1 " + bin(int(h_m1, 16)))
-print("len(m2) " + str(4 * len(m2)))
-print("m2 " + bin(int(m2, 16)))
+print("len(h_m1): " + str(4 * len(h_m1)))
+print("h_m1: " + ''.zfill(224 - int(h_m1, 16).bit_length()) + bin(int(h_m1, 16))[2:])
+print("len(m2): " + str(4 * len(m2)))
+print("m2: " + ''.zfill(4104 - int(m2, 16).bit_length()) + bin(int(m2, 16))[2:])
 print()
-# Now go to the C program, and input these values, and zero-pad them
+# Now go to the C program, and input these values
 
 PreImageOfPW1 = ""
 PreImageOfPW2 = ""
